@@ -1,0 +1,66 @@
+{
+  "name": "barsic",
+  "version": "0.0.1",
+  "description": "Parser and builder for binary data",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown ./lib/index.ts --format cjs,esm --dts --minify",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitalygashkov/barsic.git"
+  },
+  "keywords": [
+    "binary",
+    "parser",
+    "decoder",
+    "encoder",
+    "unpack",
+    "struct",
+    "structure",
+    "construct",
+    "buffer"
+  ],
+  "bugs": {
+    "url": "https://github.com/vitalygashkov/barsic/issues",
+    "email": "vitalygashkov@vk.com"
+  },
+  "author": "Vitaly Gashkov <vitalygashkov@vk.com>",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "funding": [
+    {
+      "type": "individual",
+      "url": "https://t.me/tribute/app?startapp=dqW2"
+    }
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.1",
+    "tsdown": "^0.12.7",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.3"
+  }
+}
