@@ -1,4 +1,5 @@
-import { ContextData, Schema, createSchema } from '../schema';
+import { ContextData } from '../context';
+import { Schema, createSchema } from '../schema';
 
 export const object = <T extends ContextData>(fields: {
   [key in keyof T]: Schema<T[key]>;
