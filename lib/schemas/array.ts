@@ -1,7 +1,7 @@
 import { Schema, LengthFunc, createSchema } from '../schema';
 
-export const array = <T>(subcon: Schema<T>, count: number | LengthFunc = 1) => {
-  const schema = createSchema<T[]>(`List<${(subcon as any)._name}>`, {
+export const array = <T>(subSchema: Schema<T>, count: number | LengthFunc = 1) => {
+  const schema = createSchema<T[]>(`List<${(subSchema as any)._name}>`, {
     _parse: (ctx) => {
       const c = typeof count === 'function' ? count(ctx.context) : count;
       ctx.enter(`List(count=${c})`);
@@ -9,7 +9,7 @@ export const array = <T>(subcon: Schema<T>, count: number | LengthFunc = 1) => {
       for (let i = 0; i < c; i++) {
         const itemContext = { ...ctx.context, _index: i };
         ctx.stack.push(itemContext);
-        items.push(subcon._parse(ctx));
+        items.push(subSchema._parse(ctx));
         ctx.stack.pop();
       }
       ctx.leave(`List(count=${c})`, items);
@@ -25,7 +25,7 @@ export const array = <T>(subcon: Schema<T>, count: number | LengthFunc = 1) => {
         const value = values[i];
         const itemContext = { ...ctx.context, _index: i };
         ctx.stack.push(itemContext);
-        subcon._build(value, ctx);
+        subSchema._build(value, ctx);
         ctx.stack.pop();
       }
       ctx.leave(`List(count=${values.length})`, values.length);

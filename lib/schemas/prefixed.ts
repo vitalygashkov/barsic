@@ -2,8 +2,8 @@ import { BuildingContext, checkBounds, ParsingContext } from '../context';
 import { Schema, LengthFunc, createSchema } from '../schema';
 import { concatUint8Arrays } from '../utils';
 
-export const prefixed = <T extends Schema<any>>(length: LengthFunc, subcon: T) =>
-  createSchema(`Prefixed<${(subcon as any)._name}>`, {
+export const prefixed = <T extends Schema<any>>(length: LengthFunc, subSchema: T) =>
+  createSchema(`Prefixed<${(subSchema as any)._name}>`, {
     _parse: (ctx) => {
       const len = length(ctx.context);
       ctx.enter(`Prefixed(len=${len})`);
@@ -15,7 +15,7 @@ export const prefixed = <T extends Schema<any>>(length: LengthFunc, subcon: T) =
       const subContext = new ParsingContext(subDataView, 0, ctx.debug);
       subContext.stack = [...ctx.stack];
 
-      const result = subcon._parse(subContext);
+      const result = subSchema._parse(subContext);
 
       // Advance the offset of the *main* context by the full length
       // of the prefixed section.
@@ -28,7 +28,7 @@ export const prefixed = <T extends Schema<any>>(length: LengthFunc, subcon: T) =
       // Build the sub-construct in a temporary context to get its buffer.
       const subBuildingContext = new BuildingContext();
       subBuildingContext.stack = [...ctx.stack];
-      subcon._build(v, subBuildingContext);
+      subSchema._build(v, subBuildingContext);
       const subBuffer = concatUint8Arrays(subBuildingContext.buffers);
 
       // In this version of Prefixed, the length is determined by the context

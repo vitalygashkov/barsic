@@ -168,10 +168,16 @@ Barsic provides the following built-in types:
   - `string()` - UTF-8 encoded string
 
 - **Compound Types**
-  - `array(type, length)` - Fixed or variable length array
   - `object({...})` - Object with named fields
+  - `array(type, length)` - Fixed or variable length array
   - `variant(discriminator, cases)` - Tagged union type
   - `literal(value)` - Exact value matcher
+  - `prefixed(length, subSchema)` - Prefixed data
+  - `sized(subSchema, length)` - Fixed-length data
+  - `greedyRange(subSchema)` - Greedy range of items
+  - `base64()` - Base64 encoded string
+  - `hex()` - Hex encoded string
+  - `bytes(length)` - Fixed-length byte array
 
 ## License
 
