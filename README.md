@@ -1,75 +1,148 @@
 # barsic
 
-A fluffy parser and builder for binary data.
+Barsic allows you to declaratively encode and decode binary data. It supports a wide variety of types to enable you to express a multitude of binary formats without writing any parsing code.
 
-## Installation
+## Install
 
 ```bash
-npm install barsic
+npm i barsic
 ```
 
 ## Usage
 
 ```typescript
-import { Int16ub, Struct, GreedyRange } from 'barsic';
+import { b } from 'barsic';
 
-const parser = Struct({
-  magic: Int16ub,
-  items: GreedyRange(Int16ub),
+// Define a simple user profile format
+const UserProfile = b.object({
+  version: b.uint8(), // Format version
+  nameLength: b.uint8(), // Length of the name string
+  name: b.string(), // User's name
+  age: b.uint8(), // User's age
+  scores: b.array(b.uint16(), 3), // Array of 3 game scores
 });
 
-const binaryData = new Uint8Array([0x00, 0x01, 0x00, 0x02, 0x00, 0x03]);
+// Create binary data
+const profileData = UserProfile.build({
+  version: 1,
+  nameLength: 4,
+  name: 'John',
+  age: 25,
+  scores: [100, 250, 175],
+});
 
-const result = parser.parse(binaryData);
+console.log(profileData);
+// Output: Uint8Array([
+//   0x01,             // version = 1
+//   0x04,             // nameLength = 4
+//   0x4A, 0x6F, 0x68, // "John"
+//   0x6E,
+//   0x19,             // age = 25
+//   0x00, 0x64,       // scores[0] = 100
+//   0x00, 0xFA,       // scores[1] = 250
+//   0x00, 0xAF        // scores[2] = 175
+// ])
 
-console.log(result); // { magic: 1, items: [2, 3] }
+// Parse binary data back into an object
+const parsed = UserProfile.parse(profileData);
+console.log(parsed);
+// Output:
+// {
+//   version: 1,
+//   nameLength: 4,
+//   name: "John",
+//   age: 25,
+//   scores: [100, 250, 175]
+// }
 ```
 
-## API
+```typescript
+import { b } from 'barsic';
 
-### `Int8ub`
+// Define a scheme for a simple packet format
+const Packet = b.object({
+  header: b.object({
+    magic: b.literal(new Uint8Array([0xca, 0xfe])), // Magic bytes
+    type: b.uint16(),
+    length: b.uint32(),
+  }),
+  payload: b.variant(
+    (ctx) => ctx.header.type, // Select variant based on type field
+    {
+      1: b.object({
+        // Type 1: Text message
+        message: b.string(),
+      }),
+      2: b.object({
+        // Type 2: Array of numbers
+        count: b.uint16(),
+        values: b.array(b.uint32(), (ctx) => ctx.count),
+      }),
+    }
+  ),
+});
 
-Parses and builds an 8-bit unsigned integer.
+// Example 1: Parse text message packet
+const textPacket = new Uint8Array([
+  0xca,
+  0xfe, // Magic bytes
+  0x00,
+  0x01, // Type = 1 (text)
+  0x00,
+  0x00,
+  0x00,
+  0x0b, // Length = 11
+  0x48,
+  0x65,
+  0x6c,
+  0x6c, // "Hello World"
+  0x6f,
+  0x20,
+  0x57,
+  0x6f,
+  0x72,
+  0x6c,
+  0x64,
+]);
 
-### `Int16ub`
+const parsed1 = Packet.parse(textPacket);
+console.log(parsed1);
+// Output:
+// {
+//   header: {
+//     magic: Uint8Array([0xCA, 0xFE]),
+//     type: 1,
+//     length: 11
+//   },
+//   payload: {
+//     message: "Hello World"
+//   }
+// }
 
-Parses and builds a 16-bit unsigned integer.
+// Example 2: Build array packet
+const arrayPacket = Packet.build({
+  header: {
+    magic: new Uint8Array([0xca, 0xfe]),
+    type: 2,
+    length: 14,
+  },
+  payload: {
+    count: 3,
+    values: [1, 2, 3],
+  },
+});
 
-### `Int32ub`
-
-Parses and builds a 32-bit unsigned integer.
-
-### `Bytes`
-
-Parses and builds a fixed-length byte array.
-
-### `Const`
-
-Parses and builds a constant byte array.
-
-### `Struct`
-
-Parses and builds a structure of fields.
-
-### `List`
-
-Parses and builds a list of items.
-
-### `GreedyRange`
-
-Parses and builds a list of items, stopping when the end of the data is reached.
-
-### `Switch`
-
-Parses and builds a value based on a switch case.
-
-### `Prefixed`
-
-Parses and builds a value with a fixed length prefix.
-
-### `Sized`
-
-Parses and builds a value with a dynamic length prefix.
+console.log(arrayPacket);
+// Output: Uint8Array([
+//   0xCA, 0xFE,           // Magic
+//   0x00, 0x02,           // Type = 2 (array)
+//   0x00, 0x00, 0x00, 0x0E, // Length = 14
+//   0x00, 0x03,           // Count = 3
+//   0x00, 0x00, 0x00, 0x01, // value[0] = 1
+//   0x00, 0x00, 0x00, 0x02, // value[1] = 2
+//   0x00, 0x00, 0x00, 0x03  // value[2] = 3
+// ])
+```
 
 ## License
 
