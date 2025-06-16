@@ -1,6 +1,6 @@
 # barsic
 
-A parser and builder for binary data.
+A fluffy parser and builder for binary data.
 
 ## Installation
 

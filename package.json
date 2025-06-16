@@ -1,7 +1,7 @@
 {
   "name": "barsic",
   "version": "0.0.1",
-  "description": "Parser and builder for binary data",
+  "description": "A fluffy parser and builder for binary data",
   "files": [
     "dist"
   ],

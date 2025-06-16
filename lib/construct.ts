@@ -2,16 +2,21 @@ type ContextData = { [key: string]: any };
 type LengthFunc = (context: ContextData) => number;
 type SwitchFunc = (context: ContextData) => any;
 
-/**
- * The core interface for all construct objects.
- */
-export type Construct<T> = {
-  _name: string;
-  parse(data: Uint8Array, debug?: boolean): T;
-  build(obj: T, debug?: boolean): Uint8Array;
+interface PrivateSchema<T> {
   _parse(context: ParsingContext): T;
   _build(value: T, context: BuildingContext): void;
-};
+  [method: string]: any;
+}
+
+interface PublicSchema<T> {
+  parse(data: Uint8Array, debug?: boolean): T;
+  build(obj: T, debug?: boolean): Uint8Array;
+}
+
+export type Schema<T> = {
+  _name: string;
+} & PrivateSchema<T> &
+  PublicSchema<T>;
 
 function getContextStack(ctx: ParsingContext | BuildingContext): ContextData {
   return ctx.stack[ctx.stack.length - 1];
@@ -90,7 +95,6 @@ class BuildingContext {
     }
   }
 
-  // UPDATED: enter now accepts the value being built for better logging
   enter(name: string, value?: any) {
     if (!this.debug) return;
     let valueStr = '';
@@ -131,10 +135,10 @@ function concatUint8Arrays(arrays: Uint8Array[]): Uint8Array {
   return result;
 }
 
-function createConstruct<T>(name: string, methods: Omit<Construct<T>, 'parse' | 'build' | '_name'>): Construct<T> {
+function createSchema<T>(name: string, methods: PrivateSchema<T>): Schema<T> {
   return {
-    _name: name,
     ...methods,
+    _name: name,
     parse(data: Uint8Array, debug: boolean = false): T {
       const context = new ParsingContext(new DataView(data.buffer, data.byteOffset, data.byteLength), 0, debug);
       context.enter(`TopLevel<${name}>`);
@@ -153,65 +157,71 @@ function createConstruct<T>(name: string, methods: Omit<Construct<T>, 'parse' | 
   };
 }
 
-export const Int8ub = createConstruct<number>('Int8ub', {
-  _parse: (ctx) => {
-    ctx.enter('Int8ub');
-    checkBounds(ctx, 1);
-    const v = ctx.dataView.getUint8(ctx.offset);
-    ctx.offset += 1;
-    ctx.leave('Int8ub', v);
-    return v;
-  },
-  _build: (v, ctx) => {
-    ctx.enter('Int8ub', v);
-    const buffer = new ArrayBuffer(1);
-    const view = new DataView(buffer);
-    view.setUint8(0, v);
-    ctx.buffers.push(new Uint8Array(buffer));
-    ctx.leave('Int8ub', 1);
-  },
-});
+export const Uint8 = () => {
+  return createSchema<number>('Uint8', {
+    _parse: (ctx) => {
+      ctx.enter('Uint8');
+      checkBounds(ctx, 1);
+      const v = ctx.dataView.getUint8(ctx.offset);
+      ctx.offset += 1;
+      ctx.leave('Uint8', v);
+      return v;
+    },
+    _build: (v, ctx) => {
+      ctx.enter('Uint8', v);
+      const buffer = new ArrayBuffer(1);
+      const view = new DataView(buffer);
+      view.setUint8(0, v);
+      ctx.buffers.push(new Uint8Array(buffer));
+      ctx.leave('Uint8', 1);
+    },
+  });
+};
 
-export const Int16ub = createConstruct<number>('Int16ub', {
-  _parse: (ctx) => {
-    ctx.enter('Int16ub');
-    checkBounds(ctx, 2);
-    const v = ctx.dataView.getUint16(ctx.offset, false);
-    ctx.offset += 2;
-    ctx.leave('Int16ub', v);
-    return v;
-  },
-  _build: (v, ctx) => {
-    ctx.enter('Int16ub', v);
-    const buffer = new ArrayBuffer(2);
-    const view = new DataView(buffer);
-    view.setUint16(0, v, false);
-    ctx.buffers.push(new Uint8Array(buffer));
-    ctx.leave('Int16ub', 2);
-  },
-});
+export const Uint16 = (littleEndian: boolean = false) => {
+  return createSchema<number>('Uint16', {
+    _parse: (ctx) => {
+      ctx.enter('Uint16');
+      checkBounds(ctx, 2);
+      const v = ctx.dataView.getUint16(ctx.offset, littleEndian);
+      ctx.offset += 2;
+      ctx.leave('Uint16', v);
+      return v;
+    },
+    _build: (v, ctx) => {
+      ctx.enter('Uint16', v);
+      const buffer = new ArrayBuffer(2);
+      const view = new DataView(buffer);
+      view.setUint16(0, v, littleEndian);
+      ctx.buffers.push(new Uint8Array(buffer));
+      ctx.leave('Uint16', 2);
+    },
+  });
+};
 
-export const Int32ub = createConstruct<number>('Int32ub', {
-  _parse: (ctx) => {
-    ctx.enter('Int32ub');
-    checkBounds(ctx, 4);
-    const v = ctx.dataView.getUint32(ctx.offset, false);
-    ctx.offset += 4;
-    ctx.leave('Int32ub', v);
-    return v;
-  },
-  _build: (v, ctx) => {
-    ctx.enter('Int32ub', v);
-    const buffer = new ArrayBuffer(4);
-    const view = new DataView(buffer);
-    view.setUint32(0, v, false);
-    ctx.buffers.push(new Uint8Array(buffer));
-    ctx.leave('Int32ub', 4);
-  },
-});
+export const Uint32 = (littleEndian: boolean = false) => {
+  return createSchema<number>('Int32ub', {
+    _parse: (ctx) => {
+      ctx.enter('Int32ub');
+      checkBounds(ctx, 4);
+      const v = ctx.dataView.getUint32(ctx.offset, littleEndian);
+      ctx.offset += 4;
+      ctx.leave('Int32ub', v);
+      return v;
+    },
+    _build: (v, ctx) => {
+      ctx.enter('Int32ub', v);
+      const buffer = new ArrayBuffer(4);
+      const view = new DataView(buffer);
+      view.setUint32(0, v, littleEndian);
+      ctx.buffers.push(new Uint8Array(buffer));
+      ctx.leave('Int32ub', 4);
+    },
+  });
+};
 
 export const Bytes = (length: number | LengthFunc) =>
-  createConstruct<Uint8Array>('Bytes', {
+  createSchema<Uint8Array>('Bytes', {
     _parse: (ctx) => {
       let len = typeof length === 'function' ? length(ctx.context) : length;
       if (typeof len !== 'number' || isNaN(len)) {
@@ -236,34 +246,36 @@ export const Bytes = (length: number | LengthFunc) =>
     },
   });
 
-export const Const = (expected: Uint8Array) =>
-  createConstruct<Uint8Array>('Const', {
+export const Const = (expected: Uint8Array | string) => {
+  const data = typeof expected === 'string' ? new TextEncoder().encode(expected) : expected;
+  return createSchema<Uint8Array>('Const', {
     _parse: (ctx) => {
       ctx.enter('Const');
-      checkBounds(ctx, expected.length);
-      const actual = new Uint8Array(ctx.dataView.buffer, ctx.dataView.byteOffset + ctx.offset, expected.length);
-      ctx.offset += expected.length;
+      checkBounds(ctx, data.length);
+      const actual = new Uint8Array(ctx.dataView.buffer, ctx.dataView.byteOffset + ctx.offset, data.length);
+      ctx.offset += data.length;
 
-      if (!arraysEqual(actual, expected)) {
+      if (!arraysEqual(actual, data)) {
         throw new Error(`Constant mismatch: expected [${expected}] but got [${actual}]`);
       }
-      ctx.leave('Const', expected);
-      return expected;
+      ctx.leave('Const', data);
+      return data;
     },
     _build: (value, ctx) => {
       ctx.enter('Const', value);
-      if (value && !arraysEqual(value, expected)) {
+      if (value && !arraysEqual(value, data)) {
         throw new Error(`Const build mismatch: expected [${expected}] but got [${value}]`);
       }
-      ctx.buffers.push(expected);
-      ctx.leave('Const', expected.length);
+      ctx.buffers.push(data);
+      ctx.leave('Const', data.length);
     },
   });
+};
 
 export const Struct = <T extends ContextData>(fields: {
-  [key in keyof T]: Construct<T[key]>;
+  [key in keyof T]: Schema<T[key]>;
 }) =>
-  createConstruct<T>('Struct', {
+  createSchema<T>('Struct', {
     _parse: (ctx) => {
       ctx.enter('Struct');
       const newContext = Object.create(ctx.context);
@@ -290,8 +302,8 @@ export const Struct = <T extends ContextData>(fields: {
     },
   });
 
-export const List = <T>(count: number | LengthFunc, subcon: Construct<T>) =>
-  createConstruct<T[]>(`List<${(subcon as any)._name}>`, {
+export const List = <T>(subcon: Schema<T>, count: number | LengthFunc = 1) => {
+  const schema = createSchema<T[]>(`List<${(subcon as any)._name}>`, {
     _parse: (ctx) => {
       const c = typeof count === 'function' ? count(ctx.context) : count;
       ctx.enter(`List(count=${c})`);
@@ -322,8 +334,21 @@ export const List = <T>(count: number | LengthFunc, subcon: Construct<T>) =>
     },
   });
 
-export const GreedyRange = <T>(subcon: Construct<T>) =>
-  createConstruct<T[]>(`GreedyRange<${(subcon as any)._name}>`, {
+  const extensions = {
+    length: (value: number | LengthFunc) => {
+      count = value;
+      return schema;
+    },
+  };
+
+  return {
+    ...schema,
+    ...extensions,
+  } as Schema<T[]> & typeof extensions;
+};
+
+export const GreedyRange = <T>(subcon: Schema<T>) =>
+  createSchema<T[]>(`GreedyRange<${(subcon as any)._name}>`, {
     _parse: (ctx) => {
       ctx.enter(`GreedyRange<${(subcon as any)._name}>`);
       const items: T[] = [];
@@ -355,12 +380,12 @@ export const GreedyRange = <T>(subcon: Construct<T>) =>
     },
   });
 
-export const Switch = <T, K extends Construct<any>>(
+export const Switch = <T, K extends Schema<any>>(
   switchOn: SwitchFunc,
   cases: { [key: string]: K },
-  defaultCase?: Construct<any>
+  defaultCase?: Schema<any>
 ) => {
-  return createConstruct<T>('Switch', {
+  return createSchema<T>('Switch', {
     _parse: (ctx) => {
       const key = switchOn(ctx.context);
       ctx.enter(`Switch(key=${key})`);
@@ -387,8 +412,8 @@ export const Switch = <T, K extends Construct<any>>(
   }) as K;
 };
 
-export const Prefixed = <T>(length: LengthFunc, subcon: Construct<T>) =>
-  createConstruct<T>(`Prefixed<${(subcon as any)._name}>`, {
+export const Prefixed = <T>(length: LengthFunc, subcon: Schema<T>) =>
+  createSchema<T>(`Prefixed<${(subcon as any)._name}>`, {
     _parse: (ctx) => {
       const len = length(ctx.context);
       ctx.enter(`Prefixed(len=${len})`);
@@ -428,7 +453,7 @@ export const Prefixed = <T>(length: LengthFunc, subcon: Construct<T>) =>
  * consuming any leftover bytes as padding. The total size is determined
  * by a function that inspects the parsed data itself.
  */
-export const Sized = <T>(subcon: Construct<T>, lengthFunc: (item: T) => number) => {
+export const Sized = <T>(subcon: Schema<T>, lengthFunc: (item: T) => number) => {
   if (!subcon || typeof subcon._parse !== 'function' || typeof subcon._build !== 'function') {
     throw new Error(
       'Sized: Invalid sub-construct provided. The first argument must be a valid construct object (e.g., Struct, Bytes).'
@@ -439,7 +464,7 @@ export const Sized = <T>(subcon: Construct<T>, lengthFunc: (item: T) => number) 
       'Sized: Invalid length function provided. The second argument must be a function that returns a number.'
     );
   }
-  return createConstruct<T>(`Sized<${(subcon as any)._name}>`, {
+  return createSchema<T>(`Sized<${(subcon as any)._name}>`, {
     _parse: (ctx) => {
       const startOffset = ctx.offset;
       ctx.enter(`Sized<${(subcon as any)._name}>`);
@@ -486,4 +511,19 @@ export const Sized = <T>(subcon: Construct<T>, lengthFunc: (item: T) => number) 
       ctx.leave(`Sized<${(subcon as any)._name}>`, subBuffer.length + paddingSize);
     },
   });
+};
+
+export const b = {
+  uint8: Uint8,
+  uint16: Uint16,
+  uint32: Uint32,
+  literal: Const,
+  object: Struct,
+  array: List,
+  bytes: Bytes,
+
+  switch: Switch,
+  sized: Sized,
+  prefixed: Prefixed,
+  greedyRange: GreedyRange,
 };
