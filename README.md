@@ -1,15 +1,15 @@
 # barsic
 
-Barsic allows you to declaratively encode and decode binary data. It supports a wide variety of types to enable you to express a multitude of binary formats without writing any parsing code.
+A lightweight TypeScript library for working with binary data in a type-safe and declarative way. Instead of writing manual parsing code, Barsic lets you define binary formats as simple objects and handles all the encoding and decoding for you.
 
 ## Features
 
 - 🚀 **Simple & Declarative API** - Define binary formats using a straightforward object syntax
 - 🔄 **Two-way Conversion** - Both encode (build) and decode (parse) operations
+- 🔬 **Zero Dependencies** - Lightweight and self-contained
 - 📦 **Rich Type System** - Supports integers, strings, arrays, nested objects, variants, and more
 - 🎯 **Type-safe** - Full TypeScript support with proper type inference
-- 🔬 **Zero Dependencies** - Lightweight and self-contained
-- ⚡️ **High Performance** - Optimized for both speed and memory usage
+- 🌐 **Universal** - Works in Node.js, browsers, Bun, Deno, and any JavaScript runtime
 
 ## Install
 
