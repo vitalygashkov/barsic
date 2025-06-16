@@ -1,6 +1,6 @@
 # barsic
 
-A lightweight TypeScript library for working with binary data in a type-safe and declarative way. Instead of writing manual parsing code, Barsic lets you define binary formats as simple objects and handles all the encoding and decoding for you.
+A lightweight library for working with binary data in a type-safe and declarative way. Instead of writing manual parsing code, Barsic lets you define binary formats as simple objects and handles all the encoding and decoding for you.
 
 ## Features
 
