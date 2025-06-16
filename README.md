@@ -2,6 +2,15 @@
 
 Barsic allows you to declaratively encode and decode binary data. It supports a wide variety of types to enable you to express a multitude of binary formats without writing any parsing code.
 
+## Features
+
+- 🚀 **Simple & Declarative API** - Define binary formats using a straightforward object syntax
+- 🔄 **Two-way Conversion** - Both encode (build) and decode (parse) operations
+- 📦 **Rich Type System** - Supports integers, strings, arrays, nested objects, variants, and more
+- 🎯 **Type-safe** - Full TypeScript support with proper type inference
+- 🔬 **Zero Dependencies** - Lightweight and self-contained
+- ⚡️ **High Performance** - Optimized for both speed and memory usage
+
 ## Install
 
 ```bash
@@ -143,6 +152,26 @@ console.log(arrayPacket);
 //   0x00, 0x00, 0x00, 0x03  // value[2] = 3
 // ])
 ```
+
+## Available Types
+
+Barsic provides the following built-in types:
+
+- **Integers**
+
+  - `uint8()` - 8-bit unsigned integer
+  - `uint16()` - 16-bit unsigned integer
+  - `uint32()` - 32-bit unsigned integer
+
+- **Strings**
+
+  - `string()` - UTF-8 encoded string
+
+- **Compound Types**
+  - `array(type, length)` - Fixed or variable length array
+  - `object({...})` - Object with named fields
+  - `variant(discriminator, cases)` - Tagged union type
+  - `literal(value)` - Exact value matcher
 
 ## License
 
