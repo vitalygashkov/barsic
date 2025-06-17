@@ -1,8 +1,8 @@
 import { checkBounds } from '../context';
-import { createSchema } from '../schema';
+import { createSchema, Schema } from '../schema';
 
 export const uint32 = (littleEndian: boolean = false) => {
-  return createSchema<number>('Int32ub', {
+  const schema = createSchema<number>('Int32ub', {
     _parse: (ctx) => {
       ctx.enter('Int32ub');
       checkBounds(ctx, 4);
@@ -20,4 +20,16 @@ export const uint32 = (littleEndian: boolean = false) => {
       ctx.leave('Int32ub', 4);
     },
   });
+
+  const extensions = {
+    endian: (value: 'le' | 'be') => {
+      littleEndian = value === 'le';
+      return schema;
+    },
+  };
+
+  return {
+    ...schema,
+    ...extensions,
+  } as Schema<number> & typeof extensions;
 };
