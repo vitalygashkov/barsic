@@ -6,7 +6,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsdown ./lib/index.ts --format cjs,esm --dts --minify",
+    "build": "tsdown ./lib/index.ts --format cjs,esm --dts",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "prepublishOnly": "npm run build"
