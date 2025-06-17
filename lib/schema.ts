@@ -20,6 +20,8 @@ export type Schema<T> = {
 } & PrivateSchema<T> &
   PublicSchema<T>;
 
+export type InferSchema<T> = T extends Schema<infer U> ? U : never;
+
 export function createSchema<T>(name: string, methods: PrivateSchema<T>): Schema<T> {
   return {
     ...methods,

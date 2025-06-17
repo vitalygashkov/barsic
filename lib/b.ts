@@ -12,6 +12,7 @@ import { base64 } from './schemas/base64';
 import { sized } from './schemas/sized';
 import { prefixed } from './schemas/prefixed';
 import { greedyRange } from './schemas/greedy-range';
+import { InferSchema } from './schema';
 
 export const b = {
   string,
@@ -28,4 +29,8 @@ export const b = {
   sized,
   prefixed,
   greedyRange,
-};
+} as const;
+
+export namespace b {
+  export type infer<T> = InferSchema<T>;
+}
