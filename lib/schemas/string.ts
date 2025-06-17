@@ -1,9 +1,11 @@
 import { checkBounds } from '../context';
-import { LengthFunc, createSchema } from '../schema';
+import { LengthFunc, Schema, createSchema } from '../schema';
 import { fromBuffer, fromText } from '../utils';
+import { base64 } from './base64';
+import { hex } from './hex';
 
 export const string = (length?: number | LengthFunc) => {
-  return createSchema<string>('String', {
+  const schema = createSchema<string>('String', {
     _parse: (ctx) => {
       let len = typeof length === 'function' ? length(ctx.context) : length;
       if (typeof len !== 'number' || isNaN(len)) {
@@ -30,4 +32,18 @@ export const string = (length?: number | LengthFunc) => {
       ctx.leave(`String(len=${len})`, v.length);
     },
   });
+
+  const extensions = {
+    base64: (valueLength?: number | LengthFunc) => {
+      return base64(valueLength ?? length);
+    },
+    hex: (valueLength?: number | LengthFunc) => {
+      return hex(valueLength ?? length);
+    },
+  };
+
+  return {
+    ...schema,
+    ...extensions,
+  } as Schema<string> & typeof extensions;
 };
