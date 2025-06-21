@@ -159,25 +159,33 @@ Barsic provides the following built-in types:
 
 - **Integers**
 
+  - `int8()` - 8-bit signed integer
   - `uint8()` - 8-bit unsigned integer
+  - `int16()` - 16-bit signed integer
   - `uint16()` - 16-bit unsigned integer
+  - `int32()` - 32-bit signed integer
   - `uint32()` - 32-bit unsigned integer
+  - `int64()` - 64-bit signed integer
+  - `uint64()` - 64-bit unsigned integer
+  - `float16()` - 16-bit floating point number
+  - `float32()` - 32-bit floating point number
+  - `float64()` - 64-bit floating point number
 
 - **Strings**
 
   - `string()` - UTF-8 encoded string
+  - `base64()` - Base64 encoded string
+  - `hex()` - Hex encoded string
 
 - **Compound Types**
   - `object({...})` - Object with named fields
   - `array(type, length)` - Fixed or variable length array
   - `discriminatedUnion(discriminator, cases)` - Tagged union type
   - `literal(value)` - Exact value matcher
+  - `bytes(length)` - Fixed-length byte array
   - `prefixed(length, subSchema)` - Prefixed data
   - `sized(subSchema, length)` - Fixed-length data
   - `greedyRange(subSchema)` - Greedy range of items
-  - `base64()` - Base64 encoded string
-  - `hex()` - Hex encoded string
-  - `bytes(length)` - Fixed-length byte array
 
 ## License
 
