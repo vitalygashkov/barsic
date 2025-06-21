@@ -112,6 +112,7 @@ export const concatUint8Arrays = (arrays: Uint8Array[]) => {
   return result;
 };
 
+// https://github.com/tc39/proposal-random-functions
 export class Random {
   static number(lo: number, hi: number, step?: number) {
     if (step === undefined) step = 1;
