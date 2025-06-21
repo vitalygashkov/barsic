@@ -157,7 +157,7 @@ console.log(arrayPacket);
 
 Barsic provides the following built-in types:
 
-- **Integers**
+- **Numbers**
 
   - `int8()` - 8-bit signed integer
   - `uint8()` - 8-bit unsigned integer
