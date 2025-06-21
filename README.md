@@ -7,7 +7,7 @@ A lightweight library for working with binary data in a type-safe and declarativ
 - 🚀 **Simple & Declarative API** - Define binary formats using a straightforward object syntax
 - 🔄 **Two-way Conversion** - Both encode (build) and decode (parse) operations
 - 🔬 **Zero Dependencies** - Lightweight and self-contained
-- 📦 **Rich Type System** - Supports integers, strings, arrays, nested objects, variants, and more
+- 📦 **Rich Type System** - Supports integers, strings, arrays, nested objects, discriminated unions, and more
 - 🎯 **Type-safe** - Full TypeScript support with proper type inference
 - 🌐 **Universal** - Works in Node.js, browsers, Bun, Deno, and any JavaScript runtime
 
@@ -75,7 +75,7 @@ const Packet = b.object({
     type: b.uint16(),
     length: b.uint32(),
   }),
-  payload: b.variant(
+  payload: b.discriminatedUnion(
     (ctx) => ctx.header.type, // Select variant based on type field
     {
       1: b.object({
@@ -170,7 +170,7 @@ Barsic provides the following built-in types:
 - **Compound Types**
   - `object({...})` - Object with named fields
   - `array(type, length)` - Fixed or variable length array
-  - `variant(discriminator, cases)` - Tagged union type
+  - `discriminatedUnion(discriminator, cases)` - Tagged union type
   - `literal(value)` - Exact value matcher
   - `prefixed(length, subSchema)` - Prefixed data
   - `sized(subSchema, length)` - Fixed-length data
