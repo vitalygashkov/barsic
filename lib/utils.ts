@@ -96,12 +96,6 @@ export const xorArrays = (arr1: Uint8Array, arr2: Uint8Array) => {
   return new Uint8Array(arr1.map((byte, i) => byte ^ arr2[i]));
 };
 
-export const getRandomBytes = (size: number) => {
-  const randomBytes = new Uint8Array(size);
-  crypto.getRandomValues(randomBytes);
-  return randomBytes;
-};
-
 export const arraysEqual = (a: Uint8Array, b: Uint8Array) => {
   if (a.length !== b.length) return false;
   return a.every((val, i) => val === b[i]);
@@ -117,3 +111,24 @@ export const concatUint8Arrays = (arrays: Uint8Array[]) => {
   }
   return result;
 };
+
+export class Random {
+  static number(lo: number, hi: number, step?: number) {
+    if (step === undefined) step = 1;
+    return Math.floor(Math.random() * (hi - lo) + lo) / step;
+  }
+
+  static bytes(size: number) {
+    const randomBytes = new Uint8Array(size);
+    crypto.getRandomValues(randomBytes);
+    return randomBytes;
+  }
+
+  static fillBytes(buffer: Uint8Array, start?: number, end?: number) {
+    const randomBytes = this.bytes(buffer.length);
+    if (start === undefined) buffer.set(randomBytes);
+    else buffer.set(randomBytes, start);
+    if (end === undefined) return buffer;
+    else return buffer.slice(0, end);
+  }
+}
