@@ -1,4 +1,4 @@
-import { uint8, uint16, uint32 } from './schemas/number';
+import { uint8, uint16, uint32, int8, int16, int32, int64, uint64, float16, float32, float64 } from './schemas/number';
 import { string, base64, hex } from './schemas/string';
 import { literal } from './schemas/literal';
 import { object } from './schemas/object';
@@ -11,9 +11,17 @@ import { greedyRange } from './schemas/greedy-range';
 import { InferSchema } from './schema';
 
 export const b = {
+  int8,
   uint8,
+  int16,
   uint16,
+  int32,
   uint32,
+  int64,
+  uint64,
+  float16,
+  float32,
+  float64,
 
   string,
   base64,
