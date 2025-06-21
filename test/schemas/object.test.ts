@@ -58,7 +58,7 @@ test('Context propagation in nested objects', () => {
       type: b.uint16(),
       length: b.uint16(),
     }),
-    data: b.variant(
+    data: b.discriminatedUnion(
       (ctx) => ctx.header.type, // Access type through header
       {
         1: b.object({

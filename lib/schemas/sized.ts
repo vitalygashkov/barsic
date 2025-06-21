@@ -18,7 +18,7 @@ export const sized = <T>(subSchema: Schema<T>, lengthFunc: (item: T) => number) 
       'Sized: Invalid length function provided. The second argument must be a function that returns a number.'
     );
   }
-  return createSchema<T>(`Sized<${(subSchema as any)._name}>`, {
+  return createSchema(`Sized<${(subSchema as any)._name}>`, {
     _parse: (ctx) => {
       const startOffset = ctx.offset;
       ctx.enter(`Sized<${(subSchema as any)._name}>`);

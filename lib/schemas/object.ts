@@ -3,8 +3,8 @@ import { Schema, createSchema } from '../schema';
 
 export const object = <T extends ContextData>(fields: {
   [key in keyof T]: Schema<T[key]>;
-}) =>
-  createSchema<T>('Struct', {
+}) => {
+  return createSchema('Struct', {
     _parse: (ctx) => {
       ctx.enter('Struct');
       const newContext = Object.create(ctx.context);
@@ -14,7 +14,7 @@ export const object = <T extends ContextData>(fields: {
         newContext[key] = result;
       }
       ctx.stack.pop();
-      const finalResult = Object.assign({}, newContext);
+      const finalResult: T = Object.assign({}, newContext);
       ctx.leave('Struct', finalResult);
       return finalResult;
     },
@@ -30,3 +30,4 @@ export const object = <T extends ContextData>(fields: {
       ctx.leave('Struct');
     },
   });
+};

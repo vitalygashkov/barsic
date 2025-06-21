@@ -1,7 +1,7 @@
 import { Schema, LengthFunc, createSchema } from '../schema';
 
 export const array = <T>(subSchema: Schema<T>, count: number | LengthFunc = 1) => {
-  const schema = createSchema<T[]>(`List<${(subSchema as any)._name}>`, {
+  const schema = createSchema(`List<${(subSchema as any)._name}>`, {
     _parse: (ctx) => {
       const c = typeof count === 'function' ? count(ctx.context) : count;
       ctx.enter(`List(count=${c})`);

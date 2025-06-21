@@ -2,7 +2,7 @@ import { checkBounds } from '../context';
 import { LengthFunc, createSchema } from '../schema';
 
 export const bytes = (length: number | LengthFunc) =>
-  createSchema<Uint8Array>('Bytes', {
+  createSchema('Bytes', {
     _parse: (ctx) => {
       let len = typeof length === 'function' ? length(ctx.context) : length;
       if (typeof len !== 'number' || isNaN(len)) {

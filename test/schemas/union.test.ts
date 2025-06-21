@@ -1,11 +1,11 @@
 import { expect, test } from 'vitest';
 import { b } from '../../lib';
 
-test('Variant should build and parse symmetrically', () => {
+test('DiscriminatedUnion should build and parse symmetrically', () => {
   // Arrange
   const parser = b.object({
     type: b.uint16(),
-    data: b.variant((ctx) => ctx.type, {
+    data: b.discriminatedUnion((ctx) => ctx.type, {
       1: b.uint32(),
       2: b.bytes(4),
     }),
@@ -36,7 +36,7 @@ test('Variant handles different cases', () => {
   // Define the parser with proper context handling
   const parser = b.object({
     type: b.uint16(),
-    data: b.variant(
+    data: b.discriminatedUnion(
       (ctx) => ctx.type,
       {
         1: b.object({

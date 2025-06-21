@@ -4,7 +4,7 @@ import { arraysEqual } from '../utils';
 
 export const literal = (expected: Uint8Array | string) => {
   const data = typeof expected === 'string' ? new TextEncoder().encode(expected) : expected;
-  return createSchema<Uint8Array>('Const', {
+  return createSchema('Const', {
     _parse: (ctx) => {
       ctx.enter('Const');
       checkBounds(ctx, data.length);

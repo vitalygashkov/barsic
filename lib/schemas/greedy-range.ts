@@ -1,7 +1,7 @@
 import { Schema, createSchema } from '../schema';
 
 export const greedyRange = <T>(subSchema: Schema<T>) =>
-  createSchema<T[]>(`GreedyRange<${(subSchema as any)._name}>`, {
+  createSchema(`GreedyRange<${(subSchema as any)._name}>`, {
     _parse: (ctx) => {
       ctx.enter(`GreedyRange<${(subSchema as any)._name}>`);
       const items: T[] = [];
