@@ -5,7 +5,7 @@ test('DiscriminatedUnion should build and parse symmetrically', () => {
   // Arrange
   const parser = b.object({
     type: b.uint16(),
-    data: b.discriminatedUnion((ctx) => ctx.type, {
+    data: b.discriminatedUnion('type', {
       1: b.uint32(),
       2: b.bytes(4),
     }),
@@ -32,7 +32,7 @@ test('DiscriminatedUnion should build and parse symmetrically', () => {
   expect(parsed2).toEqual(obj2);
 });
 
-test('Variant handles different cases', () => {
+test('DiscriminatedUnion handles different cases', () => {
   // Define the parser with proper context handling
   const parser = b.object({
     type: b.uint16(),
